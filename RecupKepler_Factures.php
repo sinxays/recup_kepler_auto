@@ -95,7 +95,11 @@
                 if (isset($keyvalue->owner->firstname)) {
                     $nom_acheteur = $keyvalue->owner->firstname . " " . $keyvalue->owner->lastname;
                 } else {
-                    $nom_acheteur = $keyvalue->owner->corporateNameContact;
+                    if (isset($keyvalue->owner->corporateNameContact) && !empty($keyvalue->owner->corporateNameContact)) {
+                        $nom_acheteur = $keyvalue->owner->corporateNameContact;
+                    } else {
+                        $nom_acheteur = "";
+                    }
                 }
 
                 //adresse du client

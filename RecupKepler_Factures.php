@@ -219,6 +219,7 @@
                                     break;
 
                                 case "Jean-Philippe Thomas":
+                                case "PIERRE MEHDI AQQADE":
                                     $parc = "CVO THOMAS";
                                     break;
 

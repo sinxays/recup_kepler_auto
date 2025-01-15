@@ -125,7 +125,7 @@
 
                 // pays du client
                 if (isset($keyvalue->customer->addressCity) && !empty($keyvalue->customer->addressCity)) {
-                    $pays_client = $keyvalue->customer->addressCity;
+                    $pays_client = $keyvalue->customer->addressCountry;
                 } else {
                     $pays_client = "";
                 }

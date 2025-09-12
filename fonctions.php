@@ -694,8 +694,8 @@ function save_facture_to_portail_massoutre($obj_datas)
         'vendeur' => $obj_datas->seller,
         'prix_ht' => $obj_datas->sellPriceWithoutTax,
         'prix_ttc' => $obj_datas->sellPriceWithTax,
-        'pack_first' => $pack_first,
-        'garantie' => $garantie,
+        'pack_first' => $pack_first == TRUE ? 1 : 0,
+        'garantie' => $garantie == TRUE ? 1 : 0,
         'type_garantie' => $nbr_mois_garantie_neo,
         'num_bdc' => $obj_datas->orderForm->number
     ];

@@ -677,7 +677,7 @@ function save_facture_to_portail_massoutre($obj_datas)
                 $pack_first = TRUE;
             }
             //si il ya une garantie NEO 
-            if (str_contains($item->name, 'Garantie NEO')) {
+            if (strpos($item->reference, 'Garantie NEO' !== false)) {
                 $garantie = TRUE;
                 //alors on va voir quelle durée ? 6 ,12 ,24 ?
                 $array_garantie_neo = explode(' ', $item->name);

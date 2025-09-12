@@ -691,7 +691,7 @@ function save_facture_to_portail_massoutre($obj_datas)
         'num_facture' => $obj_datas->number,
         'date_facture' => $obj_datas->invoiceDate,
         'destination' => $obj_datas->destination,
-        'vendeur' => $obj_datas->seller,
+        'vendeur' => extractFullName_from_obj_apiKepler($obj_datas->seller),
         'prix_ht' => $obj_datas->sellPriceWithoutTax,
         'prix_ttc' => $obj_datas->sellPriceWithTax,
         'pack_first' => $pack_first == TRUE ? 1 : 0,
@@ -706,3 +706,8 @@ function save_facture_to_portail_massoutre($obj_datas)
 }
 
 
+function extractFullName_from_obj_apiKepler(string $seller): string {
+    // Supprime l'email entre <...>
+    $name = trim(preg_replace('/<.*?>/', '', $seller));
+    return $name;
+}

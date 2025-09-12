@@ -76,8 +76,10 @@
             /*****************    BOUCLE du tableau de données récupérés *****************/
             foreach ($obj_final as $keydatas => $keyvalue) {
                 //on boucle par rapport au nombre de bon de commande dans le tableau datas[]
-    
 
+                // enregistrer la facture dans la base > table : portail_massoutre > facturesventes
+                save_facture_to_portail_massoutre($keyvalue);
+    
                 //get date facture
                 $date_facture_tmp = substr($keyvalue->invoiceDate, 0, 10);
                 $date_facture_tmp2 = str_replace("-", "/", $date_facture_tmp);

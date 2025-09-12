@@ -259,7 +259,7 @@ function getvehiculeInfo($reference, $token, $url_vehicule, $state, $is_not_avai
     switch ($is_not_available_for_sell) {
         case TRUE:
 
-            if (isset ($state) && $state == 'arrivage_or_parc') {
+            if (isset($state) && $state == 'arrivage_or_parc') {
                 $dataArray = array(
                     "reference" => $reference,
                     "state" => 'vehicle.state.on_arrival,vehicle.state.parc',
@@ -278,7 +278,7 @@ function getvehiculeInfo($reference, $token, $url_vehicule, $state, $is_not_avai
             break;
 
         case FALSE:
-            if (isset ($state) && $state == 'arrivage_or_parc') {
+            if (isset($state) && $state == 'arrivage_or_parc') {
                 $dataArray = array(
                     "reference" => $reference,
                     "state" => 'vehicle.state.on_arrival,vehicle.state.parc',
@@ -332,7 +332,7 @@ function getvehiculeInfo($reference, $token, $url_vehicule, $state, $is_not_avai
 
     // la on a un array
     //si on a l'erreur de token authentification alors on relance un token
-    if (isset ($obj_vehicule->code) && $obj_vehicule->code == 401) {
+    if (isset($obj_vehicule->code) && $obj_vehicule->code == 401) {
         $url = "https://www.kepler-soft.net/api/v3.0/auth-token/";
         $valeur_token = goCurlToken($url);
         $obj = getvehiculeInfo($reference, $valeur_token, $url_vehicule, $state);
@@ -426,11 +426,11 @@ function GoCurl_Facture($token, $url, $page)
     $date_to = date('Y-m-d', strtotime('-1 day'));
     // $date_to = "2024-07-11";
 
- // choper une facture spécifique
-     $dataArray = array(
-         "number" => 'VO109079',
-         "page" => $page
-     );
+    // choper une facture spécifique
+    $dataArray = array(
+        "number" => 'VO109079',
+        "page" => $page
+    );
 
 
     //sur une date
@@ -661,5 +661,48 @@ function sautdeligne()
     echo "<br/>";
 }
 
+
+function save_facture_to_portail_massoutre($obj_datas)
+{
+
+    $pack_first = FALSE;
+    $garantie = FALSE;
+    $nbr_mois_garantie_neo = 0;
+
+    $pdo = Connection::getPDO();
+    foreach ($obj_datas->items as $item_key => $item) {
+        if ($item->type == 'service_selling') {
+            // voir si on comptabilise un pack first
+            if ($item->reference == 'MISE A LA ROUTE') {
+                $pack_first = TRUE;
+            }
+            //si il ya une garantie NEO 
+            if (str_contains($item->name, 'Garantie NEO')) {
+                $garantie = TRUE;
+                //alors on va voir quelle durée ? 6 ,12 ,24 ?
+                $array_garantie_neo = explode(' ', $item->name);
+                $nbr_mois_garantie_neo = $array_garantie_neo[2];
+            }
+        }
+    }
+
+    $data = [
+        'uuid' => $obj_datas->uuid,
+        'num_facture' => $obj_datas->number,
+        'date_facture' => $obj_datas->invoiceDate,
+        'destination' => $obj_datas->destination,
+        'vendeur' => $obj_datas->seller,
+        'prix_ht' => $obj_datas->sellPriceWithoutTax,
+        'prix_ttc' => $obj_datas->sellPriceWithTax,
+        'pack_first' => $pack_first,
+        'garantie' => $garantie,
+        'type_garantie' => $nbr_mois_garantie_neo,
+        'num_bdc' => $obj_datas->orderForm->number
+    ];
+    $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie) 
+    VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($data);
+}
 
 

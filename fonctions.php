@@ -679,6 +679,7 @@ function save_facture_to_portail_massoutre($obj_datas)
                 //alors on va voir quelle durée ? 6 ,12 ,24 ?
                 $array_garantie_neo = explode(' ', $item->name);
                 $nbr_mois_garantie_neo = $array_garantie_neo[2];
+                $libelle_garantie = $item->name;
             }
         }
     }
@@ -694,10 +695,11 @@ function save_facture_to_portail_massoutre($obj_datas)
         'pack_first' => $pack_first == TRUE ? 1 : 0,
         'garantie' => $garantie == TRUE ? 1 : 0,
         'type_garantie' => $nbr_mois_garantie_neo,
-        'num_bdc' => $obj_datas->orderForm->number
+        'num_bdc' => $obj_datas->orderForm->number,
+        'libelle_garantie' => $libelle_garantie
     ];
-    $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie) 
-    VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie)";
+    $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie) 
+    VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($data);
 }

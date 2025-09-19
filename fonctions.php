@@ -658,54 +658,87 @@ function sautdeligne()
     echo "<br/>";
 }
 
-
-function save_facture_to_portail_massoutre($obj_datas)
+function delete_facture_liee_by_avoir($prix_ht, $reference_vh)
 {
 
-    $pack_first = FALSE;
-    $garantie = FALSE;
-    $nbr_mois_garantie_neo = 0;
+    //enlever le négatif sur le prix_ht
+    $prix_ht = abs((float) $prix_ht);
 
     $pdo = Connection::getPDO();
-    foreach ($obj_datas->items as $item_key => $item) {
-        if ($item->type == 'service_selling') {
-            // voir si on comptabilise un pack first
-            if ($item->reference == 'MISE A LA ROUTE') {
-                $pack_first = TRUE;
-            }
-            //si il ya une garantie NEO 
-            if (strpos($item->reference, 'Garantie NEO') !== false) {
-                $garantie = TRUE;
-                //alors on va voir quelle durée ? 6 ,12 ,24 ?
-                $array_garantie_neo = explode(' ', $item->name);
-                $nbr_mois_garantie_neo = $array_garantie_neo[2];
-                $libelle_garantie = $item->name;
-            }
-        }
-    }
 
-    $data = [
-        'uuid' => $obj_datas->uuid,
-        'num_facture' => $obj_datas->number,
-        'date_facture' => $obj_datas->invoiceDate,
-        'destination' => $obj_datas->destination,
-        'vendeur' => extractFullName_from_obj_apiKepler($obj_datas->seller),
-        'prix_ht' => $obj_datas->sellPriceWithoutTax,
-        'prix_ttc' => $obj_datas->sellPriceWithTax,
-        'pack_first' => $pack_first == TRUE ? 1 : 0,
-        'garantie' => $garantie == TRUE ? 1 : 0,
-        'type_garantie' => $nbr_mois_garantie_neo,
-        'num_bdc' => $obj_datas->orderForm->number,
-        'libelle_garantie' => $libelle_garantie
-    ];
-    $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie) 
-    VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie)";
+    $sql = "DELETE FROM facturesventes 
+        WHERE prix_ht = :prix_ht 
+        AND reference_vh = :reference_vh";
+
     $stmt = $pdo->prepare($sql);
-    $stmt->execute($data);
+
+    $stmt->execute([
+        ':prix_ht' => $prix_ht,
+        ':reference_vh' => $reference_vh
+    ]);
 }
 
 
-function extractFullName_from_obj_apiKepler(string $seller): string {
+function save_facture_to_portail_massoutre($obj_datas)
+{
+    //si c'est un avoir on va supprimer la facture liée par son prix ht et la référence du véhicule
+    if (strpos($obj_datas->number, "AV")) {
+        delete_facture_liee_by_avoir($obj_datas->sellPriceWithoutTax, $obj_datas->items[0]->reference);
+    } 
+    //sinon si c'est une facture normale
+    else {
+        $pack_first = FALSE;
+        $garantie = FALSE;
+        $nbr_mois_garantie_neo = 0;
+
+        $pdo = Connection::getPDO();
+        foreach ($obj_datas->items as $item_key => $item) {
+            //on enregistre aussi la reference du vh 
+            if ($item->type == 'vehicle_selling') {
+                $reference_vh = $item->reference;
+            }
+            if ($item->type == 'service_selling') {
+                // voir si on comptabilise un pack first
+                if ($item->reference == 'MISE A LA ROUTE') {
+                    $pack_first = TRUE;
+                }
+                //si il ya une garantie NEO 
+                if (strpos($item->reference, 'Garantie NEO') !== false) {
+                    $garantie = TRUE;
+                    //alors on va voir quelle durée ? 6 ,12 ,24 ?
+                    $array_garantie_neo = explode(' ', $item->name);
+                    $nbr_mois_garantie_neo = $array_garantie_neo[2];
+                    $libelle_garantie = $item->name;
+                }
+            }
+        }
+
+        $data = [
+            'uuid' => $obj_datas->uuid,
+            'num_facture' => $obj_datas->number,
+            'date_facture' => $obj_datas->invoiceDate,
+            'destination' => $obj_datas->destination,
+            'vendeur' => extractFullName_from_obj_apiKepler($obj_datas->seller),
+            'prix_ht' => $obj_datas->sellPriceWithoutTax,
+            'prix_ttc' => $obj_datas->sellPriceWithTax,
+            'pack_first' => $pack_first == TRUE ? 1 : 0,
+            'garantie' => $garantie == TRUE ? 1 : 0,
+            'type_garantie' => $nbr_mois_garantie_neo,
+            'num_bdc' => $obj_datas->orderForm->number,
+            'libelle_garantie' => $libelle_garantie,
+            'reference_vehicule' => $reference_vh
+
+        ];
+        $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie,reference_vehicule) 
+        VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie,:reference_vehicule)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($data);
+    }
+}
+
+
+function extractFullName_from_obj_apiKepler(string $seller): string
+{
     // Supprime l'email entre <...>
     $name = trim(preg_replace('/<.*?>/', '', $seller));
     return $name;

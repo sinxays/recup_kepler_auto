@@ -424,11 +424,11 @@ function GoCurl_Facture($token, $url, $page)
     // );
 
     $date_to = date('Y-m-d', strtotime('-1 day'));
-    // $date_to = "2024-07-11";
+    // $date_to = "2025-09-12";
 
     // choper une facture spécifique
     $dataArray = array(
-        "number" => 'VO109079',
+        "number" => 'VO116633',
         "page" => $page
     );
 
@@ -445,9 +445,6 @@ function GoCurl_Facture($token, $url, $page)
 
 
     );
-
-
-
 
     $data = http_build_query($dataArray);
 
@@ -677,7 +674,7 @@ function save_facture_to_portail_massoutre($obj_datas)
                 $pack_first = TRUE;
             }
             //si il ya une garantie NEO 
-            if (strpos($item->reference, 'Garantie NEO' !== false)) {
+            if (strpos($item->reference, 'Garantie NEO') !== false) {
                 $garantie = TRUE;
                 //alors on va voir quelle durée ? 6 ,12 ,24 ?
                 $array_garantie_neo = explode(' ', $item->name);

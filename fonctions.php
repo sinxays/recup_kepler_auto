@@ -626,7 +626,7 @@ function upload_bdc_ventes_uuid($bdc, $uuid, $date_bdc)
         'uuid' => $uuid,
         'date_bdc' => $date_bdc
     ];
-    $sql = "INSERT INTO bdc_ventes (numero_bdc, uuid,date_bdc) VALUES (:bdc, :uuid,:date_bdc)";
+    $sql = "INSERT INTO bdc_ventes (numero_bdc, uuid,date_bdc_upload) VALUES (:bdc, :uuid,:date_bdc)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($data);
 

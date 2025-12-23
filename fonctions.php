@@ -591,6 +591,7 @@ function get_CVO_by_vendeur($nom_vendeur)
 function get_name_acheteur_vendeur($nom_complet)
 {
 
+    //il faut que $nom_complet soit dan cet ordre ==> prenom nom
     $nb_word_nom_complet = str_word_count($nom_complet);
 
     switch ($nb_word_nom_complet) {
@@ -684,7 +685,7 @@ function save_facture_to_portail_massoutre($obj_datas)
     //si c'est un avoir on va supprimer la facture liée par son prix ht et la référence du véhicule
     if (strpos($obj_datas->number, "AV")) {
         delete_facture_liee_by_avoir($obj_datas->sellPriceWithoutTax, $obj_datas->items[0]->reference);
-    } 
+    }
     //sinon si c'est une facture normale
     else {
         $pack_first = FALSE;
@@ -717,12 +718,17 @@ function save_facture_to_portail_massoutre($obj_datas)
         //date d'insertion
         $today = date("Y-m-d");
 
+        //update : intégrer vendeur_id pour relier a la table collaborateur payplan
+        $prenom_nom_vendeur = extractFullName_from_obj_apiKepler($obj_datas->seller);
+        $id_collaborateur_payplan = get_id_collaborateur_payplan_by_name($prenom_nom_vendeur);
+
         $data = [
             'uuid' => $obj_datas->uuid,
             'num_facture' => $obj_datas->number,
             'date_facture' => $obj_datas->invoiceDate,
             'destination' => $obj_datas->destination,
-            'vendeur' => extractFullName_from_obj_apiKepler($obj_datas->seller),
+            'vendeur' => $prenom_nom_vendeur,
+            'id_collaborateur_payplan' => $id_collaborateur_payplan,
             'prix_ht' => $obj_datas->sellPriceWithoutTax,
             'prix_ttc' => $obj_datas->sellPriceWithTax,
             'pack_first' => $pack_first == TRUE ? 1 : 0,
@@ -735,8 +741,8 @@ function save_facture_to_portail_massoutre($obj_datas)
             'date_facture_upload' => $today
 
         ];
-        $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie,prix_ht_garantie,reference_vehicule,date_facture_upload) 
-        VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie,:prix_ht_garantie,:reference_vehicule,:date_facture_upload)";
+        $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,id_collaborateur_payplan,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie,prix_ht_garantie,reference_vehicule,date_facture_upload) 
+        VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:id_collaborateur_payplan,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie,:prix_ht_garantie,:reference_vehicule,:date_facture_upload)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($data);
     }
@@ -749,3 +755,22 @@ function extractFullName_from_obj_apiKepler(string $seller): string
     $name = trim(preg_replace('/<.*?>/', '', $seller));
     return $name;
 }
+
+function get_id_collaborateur_payplan_by_name($nom_complet)
+{
+
+    $nom_complet = str_replace("é", "e", $nom_complet);
+    $nom_complet = str_replace("è", "e", $nom_complet);
+
+    $nom = get_name_acheteur_vendeur($nom_complet);
+
+    $pdo = Connection::getPDO();
+    $request = $pdo->query("SELECT ID FROM collaborateurs_payplan WHERE nom = '$nom'");
+    $result = $request->fetch(PDO::FETCH_COLUMN);
+    if (!$result) {
+        return NULL;
+    } else {
+        return intval($result);
+    }
+}
+

@@ -709,6 +709,7 @@ function save_facture_to_portail_massoutre($obj_datas)
                     $array_garantie_neo = explode(' ', $item->name);
                     $nbr_mois_garantie_neo = $array_garantie_neo[2];
                     $libelle_garantie = $item->name;
+                    $prix_ht_garantie = $item->sellPriceWithoutTaxWithoutDiscount;
                 }
             }
         }
@@ -729,12 +730,13 @@ function save_facture_to_portail_massoutre($obj_datas)
             'type_garantie' => $nbr_mois_garantie_neo,
             'num_bdc' => $obj_datas->orderForm->number,
             'libelle_garantie' => $libelle_garantie,
+            'prix_ht_garantie' => $prix_ht_garantie,
             'reference_vehicule' => $reference_vh,
             'date_facture_upload' => $today
 
         ];
-        $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie,reference_vehicule,date_facture_upload) 
-        VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie,:reference_vehicule,:date_facture_upload)";
+        $sql = "INSERT INTO facturesventes (num_facture,uuid,date_facture,num_bdc,destination,vendeur,prix_ht,prix_ttc,pack_first,garantie,type_garantie,libelle_garantie,prix_ht_garantie,reference_vehicule,date_facture_upload) 
+        VALUES (:num_facture, :uuid,:date_facture,:num_bdc,:destination,:vendeur,:prix_ht,:prix_ttc,:pack_first,:garantie,:type_garantie,:libelle_garantie,:prix_ht_garantie,:reference_vehicule,:date_facture_upload)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($data);
     }

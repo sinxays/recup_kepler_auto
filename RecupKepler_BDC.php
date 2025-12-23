@@ -163,9 +163,9 @@
                     //get nom acheteur
                     if (isset($keyvalue->owner->firstname)) {
                         $nom_acheteur = $keyvalue->owner->firstname . " " . $keyvalue->owner->lastname;
-                    } else if(isset($keyvalue->customer->firstname)){
+                    } else if (isset($keyvalue->customer->firstname)) {
                         $nom_acheteur = $keyvalue->customer->firstname . " " . $keyvalue->customer->lastname;
-                    }else{
+                    } else {
                         $nom_acheteur = $keyvalue->customer->corporateName;
                     }
 
@@ -227,9 +227,9 @@
                                     //  recup infos du véhicule
                                     $valeur_token = goCurlToken($url_token);
                                     $state_vh = '';
-                                    $obj_result = getvehiculeInfo($reference_item, $valeur_token, $req_url_vehicule, $state_vh,FALSE);
-                                     //si on a des resultats c'est que le vh est non dispo à la vente
-                                     if (empty ($obj_result)) {
+                                    $obj_result = getvehiculeInfo($reference_item, $valeur_token, $req_url_vehicule, $state_vh, FALSE);
+                                    //si on a des resultats c'est que le vh est non dispo à la vente
+                                    if (empty($obj_result)) {
                                         $result = getvehiculeInfo($reference_item, $valeur_token, $req_url_vehicule, $state_vh, TRUE);
                                         $obj_result = $result;
                                     }
@@ -364,7 +364,7 @@
                                 $array_datas[$i]['dateBC'] = $date_BC;
                                 $array_datas[$i]['Destination_sortie'] = $destination_sortie;
                                 $array_datas[$i]['VIN'] = $vin;
-				$array_datas[$i]['uuid'] = $uuid;
+                                $array_datas[$i]['uuid'] = $uuid;
 
                                 // var_dump($array_datas[$i]);
     
@@ -401,9 +401,9 @@
                                     $valeur_token = goCurlToken($url_token);
                                     //pas disponible à la vente
                                     $state_vh = '';
-                                    $obj_result = getvehiculeInfo($reference_item, $valeur_token, $req_url_vehicule, $state_vh,FALSE);
-                                     //si on a des resultats c'est que le vh est non dispo à la vente
-                                     if (empty ($obj_result)) {
+                                    $obj_result = getvehiculeInfo($reference_item, $valeur_token, $req_url_vehicule, $state_vh, FALSE);
+                                    //si on a des resultats c'est que le vh est non dispo à la vente
+                                    if (empty($obj_result)) {
                                         $result = getvehiculeInfo($reference_item, $valeur_token, $req_url_vehicule, $state_vh, TRUE);
                                         $obj_result = $result;
                                     }
@@ -507,7 +507,7 @@
                                                 }
                                                 $array_datas[$i]['Destination_sortie'] = $destination_sortie;
                                                 $array_datas[$i]['VIN'] = $vin;
-						$array_datas[$i]['uuid'] = $uuid;
+                                                $array_datas[$i]['uuid'] = $uuid;
 
                                                 echo "+1 ligne </br>";
                                                 $nb_lignes++;
@@ -526,16 +526,16 @@
                         $nb_BC++;
                     }
                     // si pas vente marchand NI vente PARTICULIER
-                     else {
-                         echo "bdc numero $bdc erreur : destination ni vente particulier ni vente marchand<br/>";
-                     }
-    
+                    else {
+                        echo "bdc numero $bdc erreur : destination ni vente particulier ni vente marchand<br/>";
+                    }
+
                 }
                 //si c'est ni validé ni facturé ni facturé édité 
                 else {
                     $state_array[] = $state_bdc;
                 }
- 		//on insere dans la base de donnée temporaire pour identifier les bdc avec leur uuid 
+                //on insere dans la base de donnée temporaire pour identifier les bdc avec leur uuid 
                 if (!is_null($bdc) && !is_null($uuid)) {
                     $date_bdc = date("Y-m-d");
                     upload_bdc_ventes_uuid($bdc, $uuid, $date_bdc);

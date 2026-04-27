@@ -245,6 +245,86 @@ function GoCurl_Recup_BDC_ANNULE($token, $url, $page, $num_bdc = '', $date_bdc =
     return $obj;
 }
 
+
+function GoCurl_Recup_VHS_for_LAG_LLD_V4($token, $page)
+{
+
+    $obj_final = array();
+
+    $ch = curl_init();
+    $request_vehicule = "v3.8/vehicles/";
+
+    $url = "https://app.keplervo.com/api/";
+
+    $req_url_vehicule = $url . "" . $request_vehicule;
+
+    // le token
+    $header = array();
+    $header[] = 'X-Auth-Token:' . $token;
+    $header[] = 'Content-Type:text/html;charset=utf-8';
+
+    $liste_CVO = array(
+        'CVO TROYES',
+        // 'CVO CLERMONT FERRAND',
+        // 'CVO ORLEANS SUD',
+        // 'CVO BOURGES',
+        // 'CVO MASSY',
+        // 'CVO CHARTRES',
+        'CVO DREUX'
+    );
+
+
+    foreach ($liste_CVO as $cvo) {
+
+        $dataArray = array(
+            "state" => implode(',', array(
+                'vehicle.state.pending',
+                'vehicle.state.on_arrival',
+                'vehicle.state.parc'
+            )),
+            "fleet" => $cvo,
+            "distanceTraveledEnd" => 40000,
+            "count" => 100,
+            "page" => $page
+        );
+
+        $getURL = $req_url_vehicule . '?' . http_build_query($dataArray);
+
+        echo urldecode($getURL);
+
+        sautdeligne();
+
+        curl_setopt($ch, CURLOPT_URL, $getURL);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+
+        $result = curl_exec($ch);
+
+        if (curl_error($ch)) {
+            $result = curl_error($ch);
+            print_r($result);
+            echo "<br/> erreur";
+        }
+
+        // curl_close($ch);
+
+        // echo gettype($result);
+        // echo $result;
+
+        $obj = json_decode($result);
+
+        array_push($obj_final,$obj);
+    }
+
+    // die();
+
+
+    return $obj_final;
+}
+
 // FONCTION INFOS DU VEHICULES
 function getvehiculeInfo($reference, $token, $url_vehicule, $state, $is_not_available_for_sell = '')
 {
@@ -333,7 +413,7 @@ function getvehiculeInfo($reference, $token, $url_vehicule, $state, $is_not_avai
     // la on a un array
     //si on a l'erreur de token authentification alors on relance un token
     if (isset($obj_vehicule->code) && $obj_vehicule->code == 401) {
-        $url = "https://www.kepler-soft.net/api/v3.0/auth-token/";
+        $url = "https://app.keplervo.com/api/v3.0/auth-token/";
         $valeur_token = goCurlToken($url);
         $obj = getvehiculeInfo($reference, $valeur_token, $url_vehicule, $state);
         $return = $obj;

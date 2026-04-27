@@ -23,7 +23,7 @@
     include 'fonctions.php';
 
     // recup valeur token seulement
-    $url = "https://www.kepler-soft.net/api/v3.0/auth-token/";
+    $url = "https://app.keplervo.com/api/v3.0/auth-token/";
     $valeur_token = goCurlToken($url);
 
     sautdeligne();
@@ -45,7 +45,7 @@
     $request_facture = "v3.1/invoice/";
     $request_vehicule = "v3.7/vehicles/";
 
-    $url = "https://www.kepler-soft.net/api/";
+    $url = "https://app.keplervo.com/api/";
 
     $req_url = $url . "" . $request_facture;
     $req_url_vehicule = $url . "" . $request_vehicule;

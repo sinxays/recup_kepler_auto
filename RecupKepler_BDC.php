@@ -39,7 +39,7 @@
     set_time_limit(0);
 
     // recup valeur token seulement
-    $url_token = "https://www.kepler-soft.net/api/v3.0/auth-token/";
+    $url_token = "https://app.keplervo.com/api/v3.0/auth-token/";
     $valeur_token = goCurlToken($url_token);
     //$valeur_token_first = $valeur_token;
     
@@ -63,7 +63,7 @@
     $request_facture = "v3.1/invoice/";
     $request_vehicule = "v3.7/vehicles/";
 
-    $url = "https://www.kepler-soft.net/api/";
+    $url = "https://app.keplervo.com/api/";
 
     $req_url_BC = $url . "" . $request_bon_de_commande;
     $req_url_vehicule = $url . "" . $request_vehicule;

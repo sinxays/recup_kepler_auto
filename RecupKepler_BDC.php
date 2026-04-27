@@ -94,13 +94,14 @@
 
         $num_BDC = '';
         $date_bdc = '';
+        $state_bdc = '';
 
         // date d'hier
         // $date_bdc = date('Y-m-d', strtotime("-1 day"));
         // $date_bdc = date('2023-10-16');
         //date spécifique 
-        //$date_bdc = "2024-11-02";
-    
+        $date_bdc = "2026-04-";
+
 
         // on reboucle pas si on met une valeur spécifique de bdc afin de récupérer qu'une seule page de l'API
         if ($num_BDC !== '') {
